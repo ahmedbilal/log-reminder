@@ -3,7 +3,7 @@ from datetime import datetime
 
 from reminder.models import TeamMember, Worklog
 
-def should_create_new_worklow(*, worklog: Worklog) -> bool:
+def should_create_new_worklog(*, worklog: Worklog) -> bool:
     # This should be more intelligent but for now it suffice
     return worklog.created_at.month != datetime.now().month
 
@@ -17,7 +17,7 @@ def get_or_create_latest_worklog(*, member: TeamMember) -> Worklog:
     except Worklog.DoesNotExist:
         latest_worklog = Worklog.objects.create(team_member=member)
     else:
-        if should_create_new_worklow(worklog=latest_worklog):
+        if should_create_new_worklog(worklog=latest_worklog):
             latest_worklog = Worklog.objects.create(team_member=member)
 
     return latest_worklog

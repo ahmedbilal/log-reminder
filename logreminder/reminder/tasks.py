@@ -18,5 +18,5 @@ def remind_members_to_push_log():
 
 # Setup periodic tasks
 app.add_periodic_task(
-    crontab(0, 0, day_of_month="1"), remind_members_to_push_log.s(), name="remind team members to push log",
+    crontab(minute=0, hour=9), remind_members_to_push_log.s(), name="remind team members to push log",
 )
