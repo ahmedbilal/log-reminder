@@ -1,0 +1,10 @@
+__pycache__
+venv
+celerybeat-schedule
+/logreminder/logreminder/private.py
+/logreminder/db.sqlite3
+/secrets.py
+.pytest_cache
+/.vscode
+static/
+/supervisord.log
