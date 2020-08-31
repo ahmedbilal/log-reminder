@@ -27,7 +27,7 @@ class MatrixClient:
         return auth.json()["access_token"]
 
     def mention(self, username):
-        re_result = re.match(r"@(\w+):\w+.\w+", username)
+        re_result = re.match(r"@(\w+):\w+\.\w+", username)
         # Handle case in which the user is coming from some other federated server
         if re_result:
             return f'<a href="https://matrix.to/#/{re_result.group(0)}">{re_result.group(1)}</a>'
