@@ -19,6 +19,8 @@ class Company(models.Model):
             "matrix_password": "password",
             "matrix_room_id": "room_id:example.com"
         }
+
+        Note matrix_room_id must begin with !.
         """
     )
 

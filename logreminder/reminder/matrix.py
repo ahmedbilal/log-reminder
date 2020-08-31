@@ -1,3 +1,5 @@
+import re
+
 from functools import reduce
 from urllib.parse import urljoin, urlparse
 
@@ -25,7 +27,12 @@ class MatrixClient:
         return auth.json()["access_token"]
 
     def mention(self, username):
-        return f'<a href="https://matrix.to/#/@{username}:{self.user_facing_domain}">{username}</a>'
+        re_result = re.match(r"@(\w+):\w+.\w+", username)
+        # Handle case in which the user is coming from some other federated server
+        if re_result:
+            return f'<a href="https://matrix.to/#/{re_result.group(0)}">{re_result.group(1)}</a>'
+        else:
+            return f'<a href="https://matrix.to/#/@{username}:{self.user_facing_domain}">{username}</a>'
 
     def send_message(self, message, room_id):
         send_message_url = urljoin(

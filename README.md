@@ -19,8 +19,11 @@ su - app
 ```bash
 git clone https://github.com/ahmedbilal/log-reminder.git && cd log-reminder
 
-apt install docker.io git python3-pip nano pwgen nginx
-systemctl enable --now docker
+sudo apt install docker.io git python3-pip nano pwgen nginx
+sudo systemctl enable --now docker
+sudo usermod -aG docker app && exit
+su - app
+cd log-reminder
 
 pip3 install virtualenv
 virtualenv venv
@@ -35,12 +38,12 @@ nano docker-compose.yml
 nano logreminder/logreminder/private.py
 ```
 
-Now, paste the following content there and edit it accordingly. For example, create a strong random secret key for django (you can run `pwgen 50 -ycs 1` to create a strong secret key). In short, update `SECRET_KEY`, `CELERY_BROKER_URL`, `ALLOWED_HOSTS`
+Now, paste the following content there and edit it accordingly. For example, create a strong random secret key for django (you can run `pwgen 50 -ycs 1` to create a strong secret key). In short, update `SECRET_KEY`, `CELERY_BROKER_URL`, `ALLOWED_HOSTS`, `DOMAIN` (this is used to create confirmation link, so put actual domain on which the application is running).
 
 ```python
 PROTOCOL = "http"
 DOMAIN = "localhost"
-PORT = 8000
+PORT = 80
 SECRET_KEY = "secret_key_for_django"
 CELERY_RESULT_BACKEND = "rpc://"
 CELERY_BROKER_URL = "amqp://user:password@localhost//"
@@ -49,7 +52,10 @@ ALLOWED_HOSTS = ["your_ip_address_here"]
 ```
 after saving the file, run the following commands
 ```bash
-(cd logreminder && python manage.py migrate && python manage.py collectstatic && chown :www-data static -R)
+(cd logreminder && python manage.py migrate && python manage.py collectstatic && sudo chown :www-data static -R)
+
+# Keep note of username and password as you would need it to login to admin panel
+python manage.py createsuperuser
 
 # The following would start supervisord which would in turn start our application, celery worker and rabbitmq container.
 supervisord
@@ -66,7 +72,7 @@ server {
 
     server_name _;
     location /static/ {
-        root /home/meow/Desktop/log-reminder/logreminder/static;
+        root /path/to/static/;
     }
     location / {
         include proxy_params;
