@@ -31,8 +31,8 @@ class MatrixClient:
         # Handle case in which the user is coming from some other federated server
         if re_result:
             return f'<a href="https://matrix.to/#/{re_result.group(0)}">{re_result.group(1)}</a>'
-        else:
-            return f'<a href="https://matrix.to/#/@{username}:{self.user_facing_domain}">{username}</a>'
+
+        return f'<a href="https://matrix.to/#/@{username}:{self.user_facing_domain}">{username}</a>'
 
     def send_message(self, message, room_id):
         send_message_url = urljoin(

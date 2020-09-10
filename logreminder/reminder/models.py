@@ -1,9 +1,10 @@
 import uuid
-from datetime import datetime
 
 from django.db import models
+from django.utils import timezone
 
 from reminder.data import CommunicationMedium
+
 
 class Company(models.Model):
     name = models.CharField(max_length=128)
@@ -21,7 +22,7 @@ class Company(models.Model):
         }
 
         Note matrix_room_id must begin with !.
-        """
+        """,
     )
 
     def __str__(self):
@@ -46,7 +47,7 @@ class Communication(models.Model):
 class Worklog(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     team_member = models.ForeignKey(TeamMember, related_name="worklogs", on_delete=models.CASCADE)
-    created_at = models.DateTimeField(default=datetime.now)
+    created_at = models.DateTimeField(default=timezone.now)
     pushed = models.BooleanField(default=False)
     pushed_at = models.DateTimeField(blank=True, null=True)
     last_notified = models.DateTimeField(blank=True, null=True)

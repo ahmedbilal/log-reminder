@@ -49,6 +49,8 @@ CELERY_RESULT_BACKEND = "rpc://"
 CELERY_BROKER_URL = "amqp://user:password@localhost//"
 DEBUG = False
 ALLOWED_HOSTS = ["your_ip_address_here"]
+USE_TZ = True
+TIME_ZONE = "Europe/Zurich"
 ```
 after saving the file, run the following commands
 ```bash

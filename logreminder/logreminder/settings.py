@@ -109,4 +109,6 @@ STATIC_ROOT = os.path.join(BASE_DIR, "static/")
 try:
     from .private import *
 except ImportError:
-    raise ImproperlyConfigured("You must create a private.py next to logreminder/logreminder/settings.py and put your config there.")
+    raise ImproperlyConfigured(
+        "You must create a private.py next to logreminder/logreminder/settings.py and put your config there."
+    )

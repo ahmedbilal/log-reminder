@@ -1,9 +1,10 @@
-from datetime import datetime, timedelta
+from datetime import timedelta
 from uuid import uuid4
 
 from django.core import mail
 from django.test import Client, TestCase
 from django.urls import reverse, reverse_lazy
+from django.utils import timezone
 from freezegun import freeze_time
 
 from reminder.data import CommunicationMedium
@@ -11,39 +12,37 @@ from reminder.models import TeamMember, Company
 from reminder.services import send_confirmation_email
 from reminder.tasks import remind_members_to_push_log
 
-from logreminder.utils import get_base_domain, build_absolute_url
-from urllib.parse import urljoin
+from logreminder.utils import build_absolute_url
+
 
 class TestUtils(TestCase):
     def test_absolute_url_formation(self):
-        """
-        Test that get_base_domain() returns same url whether DOMAIN contains / as postfix or not
-        also get_base_domain() shouldn't append port if PORT is 80
-        """
         example_uuid = "ff0a0071-7f08-4683-b814-d4dc834f2de8"
 
         with self.settings(DOMAIN="localhost", PORT=8000):
             self.assertEqual(
                 build_absolute_url(reverse_lazy("confirm", kwargs={"worklog_uuid": example_uuid})),
-                f"http://localhost:8000/confirm/ff0a0071-7f08-4683-b814-d4dc834f2de8"
+                "http://localhost:8000/confirm/ff0a0071-7f08-4683-b814-d4dc834f2de8",
             )
 
         with self.settings(DOMAIN="localhost/", PORT=8000):
             self.assertEqual(
                 build_absolute_url(reverse_lazy("confirm", kwargs={"worklog_uuid": example_uuid})),
-                "http://localhost:8000/confirm/ff0a0071-7f08-4683-b814-d4dc834f2de8"
+                "http://localhost:8000/confirm/ff0a0071-7f08-4683-b814-d4dc834f2de8",
             )
 
         with self.settings(DOMAIN="localhost", PORT=80):
             self.assertEqual(
                 build_absolute_url(reverse_lazy("confirm", kwargs={"worklog_uuid": example_uuid})),
-                "http://localhost/confirm/ff0a0071-7f08-4683-b814-d4dc834f2de8"
+                "http://localhost/confirm/ff0a0071-7f08-4683-b814-d4dc834f2de8",
             )
 
 
 class TestEmail(TestCase):
     def test_send_confirmation_email(self):
-        send_confirmation_email(sender_email="sender@example.com", receiver_email="abc@example.com", worklog_uuid=uuid4())
+        send_confirmation_email(
+            sender_email="sender@example.com", receiver_email="abc@example.com", worklog_uuid=uuid4()
+        )
         self.assertEqual(len(mail.outbox), 1, "Email isn't being sent")
 
 
@@ -93,7 +92,7 @@ class TestTasks(TestCase):
         remind_members_to_push_log()
         self.assertEqual(self.total_emails_sent(), 2)
 
-        with freeze_time(str(datetime.now() + timedelta(days=1))):
+        with freeze_time(str(timezone.now() + timedelta(days=1))):
             remind_members_to_push_log()
             self.assertEqual(self.total_emails_sent(), 4)
 
@@ -112,7 +111,7 @@ class TestTasks(TestCase):
         self.confirm_latest_worklog(self.first)
 
         # Now, we are left with only second user as the first has confirmed
-        with freeze_time(str(datetime.now() + timedelta(days=1))) as fronzen_datetime:
+        with freeze_time(str(timezone.now() + timedelta(days=1))) as fronzen_datetime:
             # After 1 day, send_email should be triggered and it should send a reminder email
             remind_members_to_push_log()
             self.assertEqual(self.total_emails_sent(), 3)
@@ -140,6 +139,6 @@ class TestTasks(TestCase):
         self.confirm_latest_worklog(self.first)
         self.confirm_latest_worklog(self.second)
 
-        with freeze_time(str(datetime.now() + timedelta(days=30))):
+        with freeze_time(str(timezone.now() + timedelta(days=30))):
             remind_members_to_push_log()
             self.assertEqual(self.total_emails_sent(), 4)

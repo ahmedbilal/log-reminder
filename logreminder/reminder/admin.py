@@ -18,6 +18,7 @@ class CommunicationInline(admin.TabularInline):
 class TeamMemberInline(admin.TabularInline):
     model = TeamMember
 
+
 class TeamMemberAdmin(admin.ModelAdmin):
     inlines = [
         CommunicationInline,
